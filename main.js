@@ -1,34 +1,59 @@
+import InputHandler from './inputHandler.js';
+import ServerConnection from './socket.js'
+import { Player, Opponent } from './paddle.js';
+
 window.addEventListener('load', () => {
-    const canvas = document.getElementById('MessageFrame');
-    const ctx = canvas.getContext('2d');
-    canvas.height = 700;
-    canvas.width = 500;
-    let canvasStart = 20;
-    ctx.font = '20px Helvetica';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = 'black';
+    const gameScreen = document.getElementById('GameScreen');
+    const context = gameScreen.getContext('2d');
+    gameScreen.height = 700;
+    gameScreen.width = 500;
 
-    const msgInput = document.getElementById('MessageInput');
-    const sendMsg = document.getElementById('SendButton');
-
-    const pongSocket = new WebSocket('ws://localhost:9090');
-    sendMsg.onclick = () => {
-        pongSocket.send(msgInput.value);
-        writeMessage(ctx, msgInput.value, canvasStart);
-        msgInput.value = '';
+    class Game {
+        constructor(height, width) {
+            this.height = height;
+            this.width = width;
+            this.url = 'ws://localhost:9090';
+            this.server = new ServerConnection(this);
+            this.input = new InputHandler(this);
+            this.player = new Player(this);
+            this.opponent = new Opponent(this);
+            this.gameState = {
+                playerPos: this.player.xPos,
+                opponentPos: this.opponent.xPos,
+                ballXPos: 0,
+                ballYPos: 0,
+                ballHSpeed: 0,
+                ballVSpeed: 1,
+                score: 0,
+            }
+        }
+        update(timeDelta) {
+            if (this.server.connected) {
+                this.server.socket.send(JSON.stringify({ updateState: true }));
+            }
+            const { playerPos, opponentPos} = this.gameState;
+            this.player.update(playerPos);
+            this.opponent.update(opponentPos);
+        }
+        draw(context) {
+            this.player.draw(context);
+            this.opponent.draw(context);
+        }
     }
 
-    pongSocket.addEventListener('open', (event) => {
-        pongSocket.send('Hello Server!');
-    });
+    const game = new Game(gameScreen.height, gameScreen.width);
 
-    const writeMessage = (context, msg, x) => {
-        context.fillText(msg, 10, x);
-        canvasStart += 25;
+    let lastTimeStamp = 0;
+    const animate = (timeStamp) => {
+        context.fillStyle = 'black';
+        context.fillRect(0, 0, game.width, game.height);
+        context.fillStyle = 'white';
+        const timeDelta = timeStamp - lastTimeStamp;
+        lastTimeStamp = timeStamp;
+        game.update(timeDelta);
+        game.draw(context);
+        requestAnimationFrame(animate);
     }
+    animate(0);
 
-    pongSocket.addEventListener('message', (event) => {
-        console.log('Message from server ', event.data);
-        writeMessage(ctx, event.data, canvasStart);
-    });
 });
