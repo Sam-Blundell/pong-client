@@ -1,52 +1,18 @@
-import InputHandler from './inputHandler.js';
-import ServerConnection from './socket.js'
-import { Player, Opponent } from './paddle.js';
+import { PlayerOne, PlayerTwo } from './game.js';
 
 window.addEventListener('load', () => {
+    const player1Button = document.getElementById('Player1Button');
+    const player2Button = document.getElementById('Player2Button');
     const gameScreen = document.getElementById('GameScreen');
     const context = gameScreen.getContext('2d');
     gameScreen.height = 700;
     gameScreen.width = 500;
-
-    class Game {
-        constructor(height, width) {
-            this.height = height;
-            this.width = width;
-            this.url = 'ws://localhost:9090';
-            this.server = new ServerConnection(this);
-            this.input = new InputHandler(this);
-            this.player = new Player(this);
-            this.opponent = new Opponent(this);
-            this.gameState = {
-                playerPos: this.player.xPos,
-                opponentPos: this.opponent.xPos,
-                ballXPos: 0,
-                ballYPos: 0,
-                ballHSpeed: 0,
-                ballVSpeed: 1,
-                score: 0,
-            }
-        }
-        update(timeDelta) {
-            if (this.server.connected) {
-                this.server.socket.send(JSON.stringify({ updateState: true }));
-            }
-            const { playerPos, opponentPos} = this.gameState;
-            this.player.update(playerPos);
-            this.opponent.update(opponentPos);
-        }
-        draw(context) {
-            this.player.draw(context);
-            this.opponent.draw(context);
-        }
-    }
-
-    const game = new Game(gameScreen.height, gameScreen.width);
+    let game;
 
     let lastTimeStamp = 0;
     const animate = (timeStamp) => {
         context.fillStyle = 'black';
-        context.fillRect(0, 0, game.width, game.height);
+        context.fillRect(0, 0, game.screenWidth, game.screenHeight);
         context.fillStyle = 'white';
         const timeDelta = timeStamp - lastTimeStamp;
         lastTimeStamp = timeStamp;
@@ -54,6 +20,18 @@ window.addEventListener('load', () => {
         game.draw(context);
         requestAnimationFrame(animate);
     }
-    animate(0);
 
+    const initGame = (user) => {
+        if (user === 'playerOne') {
+            game = new PlayerOne(gameScreen.height, gameScreen.width);
+        } else if (user === 'playerTwo') {
+            game = new PlayerTwo(gameScreen.height, gameScreen.width);
+        }
+        player1Button.remove();
+        player2Button.remove();
+        animate(0);
+    }
+
+    player1Button.onclick = () => {initGame('playerOne')};
+    player2Button.onclick = () => {initGame('playerTwo')};
 });
