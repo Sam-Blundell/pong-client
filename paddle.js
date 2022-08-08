@@ -3,8 +3,8 @@ class Paddle {
         this.game = game;
         this.width = 60;
         this.height = 6;
-        this.xPos = (this.game.width / 2) - (this.width / 2);
-        this.yPos = this.game.height - 50;
+        this.xPos = (this.game.screenWidth / 2) - (this.width / 2);
+        this.yPos = this.game.screenHeight - 50;
         this.speed = 5;
     }
     update(serverPosition) {
@@ -15,26 +15,29 @@ class Paddle {
     }
 }
 
-export class Player extends Paddle {
+
+// subclasses created to facilitate future customisation.
+
+export class PlayerOnePaddle extends Paddle {
     constructor(game) {
         super(game);
-        this.yPos = this.game.height - 50;
+        this.yPos = this.game.screenHeight - 50;
     }
-    update(Position) {
-        super.update(Position);
+    update(serverPosition) {
+        super.update(serverPosition);
     }
     draw(context) {
         super.draw(context);
     }
 }
 
-export class Opponent extends Paddle {
+export class PlayerTwoPaddle extends Paddle {
     constructor(game) {
         super(game);
         this.yPos = 50;
     }
-    update(statePosition) {
-        super.update(statePosition);
+    update(serverPosition) {
+        super.update(serverPosition);
     }
     draw(context) {
         super.draw(context);
