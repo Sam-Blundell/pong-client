@@ -1,5 +1,6 @@
 import InputHandler from './inputHandler.js';
 import ServerConnection from './socket.js';
+import Ball from './ball.js';
 import { PlayerOnePaddle, PlayerTwoPaddle } from './paddle.js';
 
 class Game {
@@ -9,19 +10,22 @@ class Game {
         this.input = new InputHandler(this);
         this.playerOnePaddle = new PlayerOnePaddle(this);
         this.playerTwoPaddle = new PlayerTwoPaddle(this);
+        this.ball = new Ball(this);
         this.gameState = {};
     }
     update(timeDelta) {
         if (this.server.connected === true && this.opponentConnected === true) {
             this.server.socket.send(JSON.stringify({ updateState: true }));
-            const { playerOnePos, playerTwoPos} = this.gameState;
+            const { playerOnePos, playerTwoPos, ballXPos, ballYPos } = this.gameState;
             this.playerOnePaddle.update(playerOnePos);
             this.playerTwoPaddle.update(playerTwoPos);
+            this.ball.update(ballXPos, ballYPos);
         }
     }
     draw(context) {
         this.playerOnePaddle.draw(context);
         this.playerTwoPaddle.draw(context);
+        this.ball.draw(context);
     }
 }
 
