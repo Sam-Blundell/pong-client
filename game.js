@@ -2,16 +2,20 @@ import InputHandler from './inputHandler.js';
 import ServerConnection from './socket.js';
 import Ball from './ball.js';
 import { PlayerOnePaddle, PlayerTwoPaddle } from './paddle.js';
+import UI from './UI.js';
 
 class Game {
     constructor(height, width) {
         this.screenHeight = height;
         this.screenWidth = width;
+        this.ui = new UI(this);
         this.input = new InputHandler(this);
         this.playerOnePaddle = new PlayerOnePaddle(this);
         this.playerTwoPaddle = new PlayerTwoPaddle(this);
         this.ball = new Ball(this);
-        this.gameState = {};
+        this.gameState = {
+            score: [0, 0],
+        };
     }
     update(timeDelta) {
         if (this.server.connected === true && this.opponentConnected === true) {
@@ -23,6 +27,7 @@ class Game {
         }
     }
     draw(context) {
+        this.ui.draw(context);
         this.playerOnePaddle.draw(context);
         this.playerTwoPaddle.draw(context);
         this.ball.draw(context);
