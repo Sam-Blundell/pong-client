@@ -6,7 +6,6 @@ class Game {
     constructor(height, width) {
         this.screenHeight = height;
         this.screenWidth = width;
-        this.opponentConnected = false;
         this.input = new InputHandler(this);
         this.playerOnePaddle = new PlayerOnePaddle(this);
         this.playerTwoPaddle = new PlayerTwoPaddle(this);
@@ -29,8 +28,10 @@ class Game {
 export class PlayerOne extends Game {
     constructor(height, width) {
         super(height, width);
-        this.userType = 'playerOne';
+        this.gameID = null;
+        this.url = 'ws://localhost:9090/start';
         this.server = new ServerConnection(this)
+        this.opponentConnected = false;
     }
     update(timeDelta) {
         super.update(timeDelta);
@@ -41,10 +42,12 @@ export class PlayerOne extends Game {
 }
 
 export class PlayerTwo extends Game {
-    constructor(height, width) {
+    constructor(height, width, gameID) {
         super(height, width);
-        this.userType = 'playerTwo';
+        this.gameID = gameID;
+        this.url = `ws://localhost:9090/join${this.gameID}`;
         this.server = new ServerConnection(this);
+        this.opponentConnected = true;
     }
     update(timeDelta) {
         super.update(timeDelta);
