@@ -2,7 +2,9 @@ import { PlayerOne, PlayerTwo } from './game.js';
 
 window.addEventListener('load', () => {
     const player1Button = document.getElementById('Player1Button');
-    const player2Button = document.getElementById('Player2Button');
+    const joinButton = document.getElementById('JoinButton');
+    const idBox = document.getElementById('IDBox');
+    const mainForm = document.getElementById('MainForm');
     const gameScreen = document.getElementById('GameScreen');
     const context = gameScreen.getContext('2d');
     gameScreen.height = 700;
@@ -21,17 +23,17 @@ window.addEventListener('load', () => {
         requestAnimationFrame(animate);
     }
 
-    const initGame = (user) => {
+    const initGame = (user, gameID) => {
         if (user === 'playerOne') {
             game = new PlayerOne(gameScreen.height, gameScreen.width);
         } else if (user === 'playerTwo') {
-            game = new PlayerTwo(gameScreen.height, gameScreen.width);
+            game = new PlayerTwo(gameScreen.height, gameScreen.width, gameID);
         }
         player1Button.remove();
-        player2Button.remove();
+        mainForm.remove();
         animate(0);
     }
 
     player1Button.onclick = () => {initGame('playerOne')};
-    player2Button.onclick = () => {initGame('playerTwo')};
+    joinButton.onclick = () => {initGame('playerTwo', idBox.value)};
 });

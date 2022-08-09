@@ -8,8 +8,14 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <button id="Player1Button">Player 1</button>
-    <button id="Player2Button">Player 2</button>
+    <button id="Player1Button">Start New Game</button>
+    <form id="MainForm">
+        <label>
+            Enter ID
+            <input id="IDBox" type="text">
+        </label>
+        <button id="JoinButton" type="button">Join A Game</button>
+    </form>
     <canvas id="GameScreen"></canvas>
     
     <script type="module" src="./main.js"></script>
